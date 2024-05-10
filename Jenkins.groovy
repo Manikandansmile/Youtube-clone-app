@@ -64,29 +64,20 @@ pipeline {
         }
         stage('Deploy to Container') {
             steps {
-                sh 'docker run -itd --name youtube -p 8081:3000 --restart unless stopped manikandan93smily/youtube:latest'
+                sh 'docker run -itd --name youtube -p 8081:3000 --restart unless-stopped manikandan93smily/youtube:latest'
             }
         }
     }
-    post {
-        always {
-            script {
-                def result = currentBuild.result ?: 'SUCCESS'
-                
-                // Notification message
-                def body = "Jenkins Pipeline Execution Summary:\n\n"
-                body += "Status: ${result}\n\n"
-                
-                // Read Trivy image scan report
-                def trivyReport = readFile('trivyimage.txt')
-                body += "Trivy Image Scan Report:\n"
-                body += trivyReport
-                
-                // Send email notification
-                emailext body: body,
-                         subject: "Jenkins Pipeline ${result}",
-                         to: 'maniraja802@gmail.com'
+     post {
+     always {
+        emailext attachLog: true,
+            subject: "'${currentBuild.result}'",
+            body: "Project: ${env.JOB_NAME}<br/>" +
+                "Build Number: ${env.BUILD_NUMBER}<br/>" +
+                "URL: ${env.BUILD_URL}<br/>",
+            to: 'maniraja802@gmail.com',                                
+            attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
             }
         }
     }
-}
+
