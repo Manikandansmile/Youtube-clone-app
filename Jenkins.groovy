@@ -64,7 +64,7 @@ pipeline {
         }
         stage('Deploy to Container') {
             steps {
-                sh 'docker run -itd --name youtube -p 8081:80 manikandan93smily/youtube:latest'
+                sh 'docker run -itd --name youtube -p 8081:3000 --restart unless stopped manikandan93smily/youtube:latest'
             }
         }
     }
